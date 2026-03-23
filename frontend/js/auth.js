@@ -86,9 +86,38 @@ document.addEventListener("DOMContentLoaded", () => {
         return; 
       }
 
-      // If everything passes, create the account!
-      alert("Account created successfully (demo)");
-      window.location.href = "login.html";
+      // ✅ 6. If everything passes, SEND DATA TO THE BACKEND!
+      const userData = {
+        fullName: fullNameInput.value,
+        username: usernameInput.value,
+        email: emailInput.value,
+        phone: phoneInput.value,
+        password: passwordInput.value // Send the raw password, backend will hash it!
+      };
+
+      // Send the request to your backend API
+      fetch('http://localhost:5000/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          // If the backend sends an error (like "username already exists")
+          alert("Error: " + data.error);
+        } else {
+          // If the backend successfully saved the user!
+          alert("Account securely created! You can now login.");
+          window.location.href = "login.html"; // Redirect to login page
+        }
+      })
+      .catch(error => {
+        console.error("Error connecting to server:", error);
+        alert("Failed to connect to the server. Is your Node backend running?");
+      });
     });
   }
 
