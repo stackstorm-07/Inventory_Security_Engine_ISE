@@ -1,10 +1,10 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const pool = require('../config/db'); // No JWT import anymore!
+const pool = require('../config/db');
 
 const router = express.Router();
 
-// 1. SIGNUP API
+// 1. SIGNUP API (Hash password and store user)
 router.post('/signup', async (req, res) => {
   const { fullName, username, email, phone, password } = req.body;
 
@@ -19,12 +19,15 @@ router.post('/signup', async (req, res) => {
 
     res.status(201).json({ message: "User securely registered!" });
   } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ error: "Username or email already exists." });
+    }
     console.error(error);
     res.status(500).json({ error: "Failed to create account." });
   }
 });
 
-// 2. LOGIN API (Simple Password Check)
+// 2. LOGIN API (Check password)
 router.post('/login', async (req, res) => {
   const { usernameOrEmail, password } = req.body;
 
@@ -35,7 +38,7 @@ router.post('/login', async (req, res) => {
     conn.release();
 
     if (users.length === 0) {
-      return res.status(401).json({ error: "Invalid username or email." });
+      return res.status(401).json({ error: "User not found." });
     }
 
     const user = users[0];
@@ -45,7 +48,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: "Incorrect password." });
     }
 
-    // Completely removed JWT. Just sending a simple success message!
+    // Success! (We will add JWT token generation here later)
     res.status(200).json({ message: "Login successful!" });
 
   } catch (error) {
