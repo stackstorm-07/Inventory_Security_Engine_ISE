@@ -8,3 +8,6 @@ backend/.env
 # Ignore specific certificate files
 backend/certs/cert.pem
 backend/certs/key.pem
+
+.vscode/
+
