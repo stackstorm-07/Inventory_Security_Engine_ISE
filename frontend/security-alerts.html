@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Alerts - Inventory Security Engine</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+            color: #1f2937;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 0 2rem;
+            height: 64px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .navbar-brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            height: 100%;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #4b5563;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-item.active {
+            color: #2563eb;
+            border-bottom: 2px solid #2563eb;
+        }
+
+        .nav-item:hover {
+            color: #111827;
+        }
+
+        .logout-btn {
+            background-color: transparent;
+            border: 1px solid #d1d5db;
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #dc2626;
+            transition: 0.2s;
+        }
+
+        .logout-btn:hover {
+            background-color: #fef2f2;
+            border-color: #dc2626;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            margin: 0;
+        }
+
+        /* Alert Cards */
+        .alerts-container {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .alert-card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .alert-info {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-details {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-time {
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        .alert-severity {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .severity-critical {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        .severity-high {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+
+        .severity-medium {
+            background-color: #fef3c7;
+            color: #d69e2e;
+        }
+
+        .severity-low {
+            background-color: #c6f6d5;
+            color: #276749;
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+        }
+
+        .resolve-btn {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .resolve-btn:hover {
+            background-color: #059669;
+        }
+
+        .dismiss-btn {
+            background-color: #6b7280;
+            color: white;
+        }
+
+        .dismiss-btn:hover {
+            background-color: #4b5563;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-brand">Inventory Security Engine</div>
+        
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-item">Dashboard</a>
+            <a href="inventory-logs.html" class="nav-item">Inventory Logs</a>
+            <a href="security-alerts.html" class="nav-item active">Security Alerts</a>
+            <a href="access-control.html" class="nav-item">Access Control</a>
+            <a href="reports.html" class="nav-item">Reports</a>
+        </div>
+
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+    </nav>
+
+    <main class="main-content">
+        
+        <div class="page-header">
+            <h1>Security Alerts</h1>
+            <p>Active security alerts and system notifications requiring attention.</p>
+        </div>
+
+        <div class="alerts-container">
+            <!-- Alerts will be loaded dynamically -->
+        </div>
+
+    </main>
+
+    <script src="js/security-alerts.js"></script>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Inventory Security Engine</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+            color: #1f2937;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 0 2rem;
+            height: 64px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .navbar-brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            height: 100%;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #4b5563;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-item.active {
+            color: #2563eb;
+            border-bottom: 2px solid #2563eb;
+        }
+
+        .nav-item:hover {
+            color: #111827;
+        }
+
+        .logout-btn {
+            background-color: transparent;
+            border: 1px solid #d1d5db;
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #dc2626;
+            transition: 0.2s;
+        }
+
+        .logout-btn:hover {
+            background-color: #fef2f2;
+            border-color: #dc2626;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            margin: 0;
+        }
+
+        /* Report Cards */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .report-card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+        }
+
+        .report-card h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+            color: #111827;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        /* Table Container */
+        .table-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+        }
+
+        .table-container h3 {
+            margin: 0 0 1.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            font-size: 0.8rem;
+            color: #6b7280;
+            font-weight: 600;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td {
+            padding: 1rem 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #f3f4f6;
+            color: #374151;
+        }
+
+        .export-btn {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .export-btn:hover {
+            background-color: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-brand">Inventory Security Engine</div>
+        
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-item">Dashboard</a>
+            <a href="inventory-logs.html" class="nav-item">Inventory Logs</a>
+            <a href="security-alerts.html" class="nav-item">Security Alerts</a>
+            <a href="access-control.html" class="nav-item">Access Control</a>
+            <a href="reports.html" class="nav-item active">Reports</a>
+        </div>
+
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+    </nav>
+
+    <main class="main-content">
+        
+        <div class="page-header">
+            <h1>Reports</h1>
+            <p>System analytics, usage statistics, and performance metrics.</p>
+        </div>
+
+        <div class="reports-grid">
+            <div class="report-card">
+                <h3>Inventory Overview</h3>
+                <div class="metric">
+                    <span class="metric-label">Total Assets</span>
+                    <span class="metric-value">1,204</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Checked Out</span>
+                    <span class="metric-value">156</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Available</span>
+                    <span class="metric-value">1,048</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Under Maintenance</span>
+                    <span class="metric-value">12</span>
+                </div>
+            </div>
+
+            <div class="report-card">
+                <h3>Security Metrics</h3>
+                <div class="metric">
+                    <span class="metric-label">Active Alerts</span>
+                    <span class="metric-value">4</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Resolved This Month</span>
+                    <span class="metric-value">23</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">System Uptime</span>
+                    <span class="metric-value">99.9%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Failed Access Attempts</span>
+                    <span class="metric-value">7</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3>Monthly Activity Summary</h3>
+                <button class="export-btn">Export Report</button>
+            </div>
+            <table id="reportsTable">
+                <thead>
+                    <tr>
+                        <th>MONTH</th>
+                        <th>TOTAL TRANSACTIONS</th>
+                        <th>CHECK-OUTS</th>
+                        <th>CHECK-INS</th>
+                        <th>SECURITY INCIDENTS</th>
+                        <th>USER ACTIVITY</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be loaded dynamically -->
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+    <script src="js/reports.js"></script>
+</body>
+</html>
