@@ -73,7 +73,7 @@ router.get('/access-control', verifyToken, requireRole('admin'), async (req, res
   try {
     const conn = await pool.getConnection();
     const query = `
-      SELECT id, username, full_name, email, role, department, status, last_login
+      SELECT id, username, full_name, email, role, is_2fa_enabled, is_active, created_at
       FROM users
       ORDER BY full_name
     `;
@@ -87,19 +87,19 @@ router.get('/access-control', verifyToken, requireRole('admin'), async (req, res
   }
 });
 
-// Update user role/status - admin only
+// Update user role/2FA status - admin only
 router.put('/access-control/:id', verifyToken, requireRole('admin'), async (req, res) => {
   const { id } = req.params;
-  const { role, department, status } = req.body;
+  const { role, is_2fa_enabled, is_active } = req.body;
 
   try {
     const conn = await pool.getConnection();
     const query = `
       UPDATE users
-      SET role = ?, department = ?, status = ?
+      SET role = ?, is_2fa_enabled = ?, is_active = ?
       WHERE id = ?
     `;
-    await conn.query(query, [role, department, status, id]);
+    await conn.query(query, [role, is_2fa_enabled, is_active, id]);
     conn.release();
 
     res.json({ message: 'User updated successfully' });

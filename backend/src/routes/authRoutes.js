@@ -14,7 +14,7 @@ router.post('/signup', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const conn = await pool.getConnection();
-    const query = `INSERT INTO users (full_name, username, email, phone, password_hash, role, department, status, last_login) VALUES (?, ?, ?, ?, ?, 'user', 'General', 'active', NULL)`;
+    const query = `INSERT INTO users (full_name, username, email, phone, password_hash, role, is_active) VALUES (?, ?, ?, ?, ?, 'user', 1)`;
     await conn.query(query, [fullName, username, email, phone, hashedPassword]);
     conn.release();
 
@@ -34,7 +34,7 @@ router.post('/login', async (req, res) => {
 
   try {
     const conn = await pool.getConnection();
-    const query = `SELECT id, username, email, role, department, status FROM users WHERE email = ? OR username = ?`;
+    const query = `SELECT id, username, email, role, is_active, password_hash FROM users WHERE email = ? OR username = ?`;
     const users = await conn.query(query, [usernameOrEmail, usernameOrEmail]);
     conn.release();
 
@@ -45,30 +45,15 @@ router.post('/login', async (req, res) => {
     const user = users[0];
     
     // Check if user is active
-    if (user.status !== 'active') {
+    if (user.is_active !== 1) {
       return res.status(401).json({ error: "Account is inactive." });
     }
 
-    const passwordQuery = `SELECT password_hash FROM users WHERE id = ?`;
-    const conn2 = await pool.getConnection();
-    const passwordResult = await conn2.query(passwordQuery, [user.id]);
-    conn2.release();
-
-    if (passwordResult.length === 0) {
-      return res.status(401).json({ error: "User not found." });
-    }
-
-    const isMatch = await bcrypt.compare(password, passwordResult[0].password_hash);
+    const isMatch = await bcrypt.compare(password, user.password_hash);
 
     if (!isMatch) {
       return res.status(401).json({ error: "Incorrect password." });
     }
-
-    // Update last login
-    const updateQuery = `UPDATE users SET last_login = NOW() WHERE id = ?`;
-    const conn3 = await pool.getConnection();
-    await conn3.query(updateQuery, [user.id]);
-    conn3.release();
 
     // Generate JWT token
     const token = jwt.sign(
@@ -76,8 +61,7 @@ router.post('/login', async (req, res) => {
         id: user.id, 
         username: user.username, 
         email: user.email, 
-        role: user.role,
-        department: user.department
+        role: user.role
       },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
@@ -90,7 +74,7 @@ router.post('/login', async (req, res) => {
         id: user.id,
         username: user.username,
         role: user.role,
-        department: user.department
+        email: user.email
       }
     });
 

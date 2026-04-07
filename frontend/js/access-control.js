@@ -66,8 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
         tableBody.innerHTML = users.map(user => {
             const userId = `USR-${String(user.id).padStart(3, '0')}`;
             const roleClass = `role-${user.role}`;
-            const statusClass = user.status === 'active' ? 'status-active' : 'status-inactive';
-            const lastLogin = user.last_login ? new Date(user.last_login).toLocaleString() : 'Never';
+            const statusClass = user.is_active === 1 ? 'status-active' : 'status-inactive';
+            const createdAt = user.created_at ? new Date(user.created_at).toLocaleString() : 'Unknown';
 
             return `
                 <tr>
@@ -75,11 +75,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td>${user.full_name}</td>
                     <td>${user.email}</td>
                     <td><span class="role-badge ${roleClass}">${user.role.charAt(0).toUpperCase() + user.role.slice(1)}</span></td>
-                    <td>${user.department}</td>
-                    <td><span class="${statusClass}">${user.status.charAt(0).toUpperCase() + user.status.slice(1)}</span></td>
-                    <td>${lastLogin}</td>
+                    <td><span class="${statusClass}">${user.is_active === 1 ? 'Active' : 'Inactive'}</span></td>
+                    <td>${user.is_2fa_enabled === 1 ? 'Enabled' : 'Disabled'}</td>
+                    <td>${createdAt}</td>
                     <td>
-                        <button class="action-btn edit-btn" onclick="editUser(${user.id}, '${user.role}', '${user.department}', '${user.status}')">Edit</button>
+                        <button class="action-btn edit-btn" onclick="editUser(${user.id}, '${user.role}', ${user.is_2fa_enabled}, ${user.is_active})">Edit</button>
                         <button class="action-btn" onclick="revokeUser(${user.id})">Revoke</button>
                     </td>
                 </tr>
@@ -88,31 +88,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Global functions for button clicks
-    window.editUser = (userId, currentRole, currentDepartment, currentStatus) => {
+    window.editUser = (userId, currentRole, current2FA, currentActive) => {
         const newRole = prompt('Enter new role (admin/manager/user):', currentRole);
         if (!newRole || !['admin', 'manager', 'user'].includes(newRole)) {
             alert('Invalid role. Must be admin, manager, or user.');
             return;
         }
 
-        const newDepartment = prompt('Enter new department:', currentDepartment);
-        if (!newDepartment) return;
-
-        const newStatus = prompt('Enter new status (active/inactive):', currentStatus);
-        if (!newStatus || !['active', 'inactive'].includes(newStatus)) {
-            alert('Invalid status. Must be active or inactive.');
+        const new2FA = prompt('Enable 2FA? (1 for yes, 0 for no):', current2FA);
+        if (new2FA === null || !['0', '1'].includes(new2FA)) {
+            alert('Invalid input. Enter 0 or 1.');
             return;
         }
 
-        updateUser(userId, newRole, newDepartment, newStatus);
+        updateUser(userId, newRole, parseInt(new2FA), 1);
     };
 
     window.revokeUser = (userId) => {
         if (!confirm('Are you sure you want to revoke this user\'s access?')) return;
-        updateUser(userId, 'user', 'General', 'inactive');
+        updateUser(userId, 'user', 0, 0);
     };
 
-    async function updateUser(userId, role, department, status) {
+    async function updateUser(userId, role, is2FAEnabled, isActive) {
         try {
             const response = await fetch(`http://localhost:5000/api/dashboard/access-control/${userId}`, {
                 method: 'PUT',
@@ -120,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ role, department, status })
+                body: JSON.stringify({ role, is_2fa_enabled: is2FAEnabled, is_active: isActive })
             });
 
             if (response.ok) {

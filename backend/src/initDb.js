@@ -29,9 +29,9 @@ async function initializeDatabase() {
         phone VARCHAR(20),
         password_hash VARCHAR(255) NOT NULL,
         role ENUM('admin', 'manager', 'user') DEFAULT 'user',
-        department VARCHAR(100) DEFAULT 'General',
-        status ENUM('active', 'inactive') DEFAULT 'active',
-        last_login DATETIME NULL,
+        totp_secret VARCHAR(255),
+        is_2fa_enabled BOOLEAN DEFAULT FALSE,
+        is_active BOOLEAN DEFAULT TRUE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -95,16 +95,8 @@ async function initializeDatabase() {
 
 async function insertSampleData(conn) {
   try {
-    // Insert sample users
-    await conn.query(`
-      INSERT IGNORE INTO users (full_name, username, email, phone, password_hash, role, department, status) VALUES
-      ('John Doe', 'johndoe', 'john.doe@company.com', '1234567890', '$2b$10$dummy.hash.for.demo', 'admin', 'IT Department', 'active'),
-      ('Jane Smith', 'janesmith', 'jane.smith@company.com', '1234567891', '$2b$10$dummy.hash.for.demo', 'manager', 'Warehouse', 'active'),
-      ('Mike Johnson', 'mikejohnson', 'mike.johnson@company.com', '1234567892', '$2b$10$dummy.hash.for.demo', 'user', 'Operations', 'active'),
-      ('Sarah Wilson', 'sarahwilson', 'sarah.wilson@company.com', '1234567893', '$2b$10$dummy.hash.for.demo', 'user', 'Executive', 'active'),
-      ('Tom Brown', 'tombrown', 'tom.brown@company.com', '1234567894', '$2b$10$dummy.hash.for.demo', 'user', 'IT Department', 'inactive')
-    `);
-
+    // Skip dummy user insertion - keeping only manually added users
+    
     // Insert sample inventory logs
     await conn.query(`
       INSERT IGNORE INTO inventory_logs (date_time, asset_id, item_name, user, action, location, status) VALUES
