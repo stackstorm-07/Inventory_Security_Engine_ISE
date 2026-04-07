@@ -11,6 +11,21 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
+    // Role-based UI hiding
+    if (user.role) {
+        // Hide Access Control link for non-admins
+        const accessControlLink = document.querySelector('a[href="access-control.html"]');
+        if (accessControlLink && user.role !== 'admin') {
+            accessControlLink.style.display = 'none';
+        }
+
+        // Hide Reports link for viewers
+        const reportsLink = document.querySelector('a[href="reports.html"]');
+        if (reportsLink && user.role === 'viewer') {
+            reportsLink.style.display = 'none';
+        }
+    }
+
     // Load security alerts
     loadSecurityAlerts();
 

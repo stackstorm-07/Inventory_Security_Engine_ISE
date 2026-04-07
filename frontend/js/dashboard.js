@@ -2,9 +2,48 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Check authentication
     const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    
     if (!token) {
         window.location.href = "login.html";
         return;
+    }
+
+    // Update welcome message with user role
+    const welcomeMessage = document.getElementById("welcomeMessage");
+    if (welcomeMessage && user.username) {
+        const roleDisplay = user.role ? `(${user.role.charAt(0).toUpperCase() + user.role.slice(1)})` : '';
+        welcomeMessage.textContent = `Welcome ${user.username} ${roleDisplay} - Security Dashboard`;
+    }
+
+    // Role-based navigation hiding
+    const userRole = user.role;
+    const navLinks = document.querySelectorAll('.nav-links .nav-item');
+    
+    navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        
+        // Hide Access Control for non-admins
+        if (href === 'access-control.html' && userRole !== 'admin') {
+            link.style.display = 'none';
+        }
+        
+        // Hide Security Alerts and Reports for viewers
+        if ((href === 'security-alerts.html' || href === 'reports.html') && userRole === 'viewer') {
+            link.style.display = 'none';
+        }
+    });
+
+    // Add Complaints link for viewers only
+    if (userRole === 'viewer') {
+        const navLinksContainer = document.querySelector('.nav-links');
+        if (navLinksContainer) {
+            const complaintsLink = document.createElement('a');
+            complaintsLink.href = 'complaints.html';
+            complaintsLink.className = 'nav-item';
+            complaintsLink.textContent = 'Complaints';
+            navLinksContainer.insertBefore(complaintsLink, navLinksContainer.lastElementChild);
+        }
     }
 
     // 1. ELEMENT SELECTORS

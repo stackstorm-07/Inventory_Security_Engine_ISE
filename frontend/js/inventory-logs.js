@@ -4,9 +4,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Check authentication
     const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
     if (!token) {
         window.location.href = "login.html";
         return;
+    }
+
+    // Role-based UI hiding
+    if (user.role) {
+        // Hide Access Control link for non-admins
+        const accessControlLink = document.querySelector('a[href="access-control.html"]');
+        if (accessControlLink && user.role !== 'admin') {
+            accessControlLink.style.display = 'none';
+        }
+
+        // Hide Security Alerts and Reports links for viewers
+        const securityAlertsLink = document.querySelector('a[href="security-alerts.html"]');
+        if (securityAlertsLink && user.role === 'viewer') {
+            securityAlertsLink.style.display = 'none';
+        }
+
+        const reportsLink = document.querySelector('a[href="reports.html"]');
+        if (reportsLink && user.role === 'viewer') {
+            reportsLink.style.display = 'none';
+        }
     }
 
     // Load inventory logs

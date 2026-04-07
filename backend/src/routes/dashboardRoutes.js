@@ -5,8 +5,8 @@ const { requireRole } = require('../middleware/rbac');
 
 const router = express.Router();
 
-// Get inventory logs - accessible to admin, manager, user
-router.get('/inventory-logs', verifyToken, requireRole('admin', 'manager', 'user'), async (req, res) => {
+// Get inventory logs - accessible to admin, staff, viewer
+router.get('/inventory-logs', verifyToken, requireRole('admin', 'staff', 'viewer'), async (req, res) => {
   try {
     const conn = await pool.getConnection();
     const query = `
@@ -25,8 +25,8 @@ router.get('/inventory-logs', verifyToken, requireRole('admin', 'manager', 'user
   }
 });
 
-// Get security alerts - accessible to admin, manager
-router.get('/security-alerts', verifyToken, requireRole('admin', 'manager'), async (req, res) => {
+// Get security alerts - accessible to admin, staff
+router.get('/security-alerts', verifyToken, requireRole('admin', 'staff'), async (req, res) => {
   try {
     const conn = await pool.getConnection();
     const query = `
@@ -109,8 +109,8 @@ router.put('/access-control/:id', verifyToken, requireRole('admin'), async (req,
   }
 });
 
-// Get reports data - admin and manager
-router.get('/reports', verifyToken, requireRole('admin', 'manager'), async (req, res) => {
+// Get reports data - admin and staff
+router.get('/reports', verifyToken, requireRole('admin', 'staff'), async (req, res) => {
   try {
     const conn = await pool.getConnection();
 
@@ -160,6 +160,98 @@ router.get('/reports', verifyToken, requireRole('admin', 'manager'), async (req,
   } catch (error) {
     console.error('Error fetching reports:', error);
     res.status(500).json({ error: 'Failed to fetch reports' });
+  }
+});
+
+// Complaints system - viewers can submit, admins/staff can view and manage
+router.post('/complaints', verifyToken, requireRole('viewer'), async (req, res) => {
+  const { title, category, priority, description } = req.body;
+  const userId = req.user.id;
+
+  if (!title || !category || !priority || !description) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  try {
+    const conn = await pool.getConnection();
+    const query = `
+      INSERT INTO complaints (user_id, title, category, priority, description, status, created_at)
+      VALUES (?, ?, ?, ?, ?, 'pending', NOW())
+    `;
+    await conn.query(query, [userId, title, category, priority, description]);
+    conn.release();
+
+    res.status(201).json({ message: 'Complaint submitted successfully' });
+  } catch (error) {
+    console.error('Error submitting complaint:', error);
+    res.status(500).json({ error: 'Failed to submit complaint' });
+  }
+});
+
+router.get('/complaints', verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  const userRole = req.user.role;
+
+  try {
+    const conn = await pool.getConnection();
+
+    let query;
+    let params;
+
+    if (userRole === 'viewer') {
+      // Viewers can only see their own complaints
+      query = `
+        SELECT c.*, u.username as submitted_by,
+               s.username as assigned_staff
+        FROM complaints c
+        LEFT JOIN users u ON c.user_id = u.id
+        LEFT JOIN users s ON c.assigned_staff_id = s.id
+        WHERE c.user_id = ?
+        ORDER BY c.created_at DESC
+      `;
+      params = [userId];
+    } else {
+      // Admins and staff can see all complaints
+      query = `
+        SELECT c.*, u.username as submitted_by,
+               s.username as assigned_staff
+        FROM complaints c
+        LEFT JOIN users u ON c.user_id = u.id
+        LEFT JOIN users s ON c.assigned_staff_id = s.id
+        ORDER BY c.created_at DESC
+      `;
+      params = [];
+    }
+
+    const complaints = await conn.query(query, params);
+    conn.release();
+
+    res.json(complaints);
+  } catch (error) {
+    console.error('Error fetching complaints:', error);
+    res.status(500).json({ error: 'Failed to fetch complaints' });
+  }
+});
+
+// Update complaint status - admin and staff only
+router.put('/complaints/:id', verifyToken, requireRole('admin', 'staff'), async (req, res) => {
+  const { id } = req.params;
+  const { status, assigned_staff_id } = req.body;
+
+  try {
+    const conn = await pool.getConnection();
+    const query = `
+      UPDATE complaints
+      SET status = ?, assigned_staff_id = ?, updated_at = NOW()
+      WHERE id = ?
+    `;
+    await conn.query(query, [status, assigned_staff_id, id]);
+    conn.release();
+
+    res.json({ message: 'Complaint updated successfully' });
+  } catch (error) {
+    console.error('Error updating complaint:', error);
+    res.status(500).json({ error: 'Failed to update complaint' });
   }
 });
 

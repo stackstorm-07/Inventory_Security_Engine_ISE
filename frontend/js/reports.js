@@ -12,6 +12,15 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
+    // Role-based UI hiding
+    if (user.role) {
+        // Hide Access Control link for non-admins
+        const accessControlLink = document.querySelector('a[href="access-control.html"]');
+        if (accessControlLink && user.role !== 'admin') {
+            accessControlLink.style.display = 'none';
+        }
+    }
+
     // Load reports data
     loadReports();
 
