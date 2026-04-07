@@ -6,6 +6,9 @@ const pool = require('../config/db');
 
 const router = express.Router();
 
+// Store CAPTCHA answers temporarily (in production, use Redis or database)
+const captchaStore = new Map();
+
 // 1. SIGNUP API (Hash password and store user)
 router.post('/signup', async (req, res) => {
   const { fullName, username, email, phone, password } = req.body;
@@ -87,19 +90,18 @@ router.post('/login', async (req, res) => {
 
 // 3. FORGOT PASSWORD - create reset token
 router.post('/forgot-password', async (req, res) => {
-  const { email } = req.body;
+  const { username } = req.body;
 
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required.' });
+  if (!username) {
+    return res.status(400).json({ error: 'Username is required.' });
   }
 
   try {
     const conn = await pool.getConnection();
-
-    const [user] = await conn.query('SELECT id FROM users WHERE email = ?', [email]);
+    const [user] = await conn.query('SELECT id FROM users WHERE username = ?', [username]);
     if (!user) {
       conn.release();
-      return res.status(404).json({ error: 'Email not found.' });
+      return res.status(404).json({ error: 'Username not found.' });
     }
 
     await conn.query(`CREATE TABLE IF NOT EXISTS password_reset_tokens (
@@ -127,10 +129,10 @@ router.post('/forgot-password', async (req, res) => {
 
 // 4. RESET PASSWORD
 router.post('/reset-password', async (req, res) => {
-  const { email, token, newPassword } = req.body;
+  const { username, token, newPassword } = req.body;
 
-  if (!email || !token || !newPassword) {
-    return res.status(400).json({ error: 'Email, reset code, and new password are required.' });
+  if (!username || !token || !newPassword) {
+    return res.status(400).json({ error: 'Username, reset code, and new password are required.' });
   }
 
   try {
@@ -139,10 +141,10 @@ router.post('/reset-password', async (req, res) => {
       SELECT pr.id AS token_id, pr.user_id
       FROM password_reset_tokens pr
       JOIN users u ON u.id = pr.user_id
-      WHERE pr.token = ? AND u.email = ? AND pr.expires_at >= NOW()
+      WHERE pr.token = ? AND u.username = ? AND pr.expires_at >= NOW()
       LIMIT 1
     `;
-    const results = await conn.query(query, [token, email]);
+    const results = await conn.query(query, [token, username]);
 
     if (results.length === 0) {
       conn.release();
