@@ -19,7 +19,7 @@ A secure web-based Inventory Management System (IMS) integrated with core cybers
 
 ## 4. User Roles:
 1. Admin: Full system control, manage users, roles, and permissions.
-2. Manager: Update stock details, manage suppliers, and generate reports
+2. Viewer: Raise Complaints and see if their problem is resolved or not.
 3. Staff / Employee: View inventory data, and Limited access (no sensitive modifications)
 
 ## 5. Technology Stack
