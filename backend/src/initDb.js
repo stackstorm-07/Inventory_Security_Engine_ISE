@@ -17,8 +17,6 @@ async function initializeDatabase() {
     await conn.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`);
     await conn.query(`USE ${process.env.DB_NAME}`);
 
-    console.log('Database initialized successfully');
-
     // Create users table with additional columns
     await conn.query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -110,8 +108,6 @@ async function initializeDatabase() {
       )
     `);
 
-    console.log('Tables created successfully');
-
     // Insert sample data
     await insertSampleData(conn);
 
@@ -168,12 +164,6 @@ async function insertSampleData(conn) {
       `INSERT IGNORE INTO users (full_name, username, email, phone, password_hash, role, is_active) VALUES ${rowPlaceholders}`,
       staffValues.flat()
     );
-
-    console.log('⭐ Admin and staff accounts created:')
-    console.log('   Admins: AU2420148, AU2420149, AU2420150 with password 380011');
-    console.log('   Staff: AU0000001..AU0000012 with password 380010');
-    console.log('   ⚠️  IMPORTANT: Change passwords for production use!');
-    
     // Insert sample inventory logs
     
     // Insert sample inventory logs
@@ -205,8 +195,6 @@ async function insertSampleData(conn) {
       ('AST-067', 'Apple iPad Pro', 'Tablet', 'Executive Office', 'checked_out', 'Sarah Wilson'),
       ('AST-089', 'Lenovo ThinkPad', 'Laptop', 'Warehouse B', 'available', NULL)
     `);
-
-    console.log('Sample data inserted successfully');
 
   } catch (error) {
     console.error('Error inserting sample data:', error);
