@@ -10,7 +10,6 @@
 
 <div class="wrapper">
 
-  <!-- LEFT SIDE -->
   <div class="left-panel">
     <div class="overlay">
       <h1>Inventory Security Engine</h1>
@@ -18,17 +17,15 @@
     </div>
   </div>
 
-  <!-- RIGHT SIDE -->
   <div class="right-panel">
     <div class="form-box">
-      <h2>Login</h2>
-      <p>Access your account</p>
+      <h2 id="formTitle">Login</h2>
+      <p id="formSubtitle">Access your account</p>
 
       <form id="loginForm">
         <input type="text"     id="loginIdentifier" placeholder="Username or Email" required>
         <input type="password" id="loginPassword"   placeholder="Password"          required>
 
-        <!-- ✅ TEXT CAPTCHA (canvas + regex, no API key needed) -->
         <div class="captcha-box">
           <label class="captcha-label">Captcha</label>
           <div class="captcha-row">
@@ -43,11 +40,20 @@
         <button type="submit">Login</button>
       </form>
 
-     <div class="forgot-password-section">
+      <form id="twoFactorForm" style="display: none;">
+        <p style="margin-bottom: 15px; color: #64748b; font-size: 0.9rem;">A 6-digit verification code has been sent to your email.</p>
+        <input type="text" id="twoFactorCode" placeholder="123456" maxlength="6" required style="letter-spacing: 5px; text-align: center; font-size: 1.2rem; font-weight: bold;">
+        <p id="twoFactorError" style="color: #dc2626; font-size: 0.85rem; margin-bottom: 10px;"></p>
+        
+        <button type="submit">Verify & Login</button>
+        <button type="button" id="backToLoginBtn" style="margin-top: 10px; background: transparent; border: 1px solid #cbd5e1; color: #475569; width: 100%; padding: 12px; border-radius: 5px; cursor: pointer; transition: 0.3s; font-weight: bold;">Back to Login</button>
+      </form>
+
+      <div class="forgot-password-section" id="forgotPasswordDiv">
         <a href="forgot-password.html">Forgot password?</a>
       </div>
 
-      <p class="switch">
+      <p class="switch" id="createAccountDiv">
         Don't have an account? <a href="signup.html">Create Account</a>
       </p>
     </div>

@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
-const nodemailer = require('nodemailer'); // ✅ IMPORTED NODEMAILER
+const nodemailer = require('nodemailer');
 
 const router = express.Router();
 
@@ -15,9 +15,6 @@ const transporter = nodemailer.createTransport({
     pass: 'qbdlupbfjhzlvefn' // Your actual App Password
   }
 });
-
-// Store CAPTCHA answers temporarily (in production, use Redis or database)
-const captchaStore = new Map();
 
 // 1. SIGNUP API (Hash password and store user)
 router.post('/signup', async (req, res) => {
@@ -42,7 +39,7 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// 2. LOGIN API (Check password)
+// 2. LOGIN API (Check password, Role-Based 2FA)
 router.post('/login', async (req, res) => {
   const { usernameOrEmail, password } = req.body;
 
@@ -50,33 +47,107 @@ router.post('/login', async (req, res) => {
     const conn = await pool.getConnection();
     const query = `SELECT id, username, email, role, is_active, password_hash FROM users WHERE email = ? OR username = ?`;
     const users = await conn.query(query, [usernameOrEmail, usernameOrEmail]);
-    conn.release();
 
     if (users.length === 0) {
+      conn.release();
       return res.status(401).json({ error: "User not found." });
     }
 
     const user = users[0];
     
-    // Check if user is active
     if (user.is_active !== 1) {
+      conn.release();
       return res.status(401).json({ error: "Account is inactive." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password_hash);
-
     if (!isMatch) {
+      conn.release();
       return res.status(401).json({ error: "Incorrect password." });
     }
 
-    // Generate JWT token
+    // 🚨 ROLE CHECK: Bypass 2FA if the user is 'admin' or 'staff'
+    if (user.role === 'admin' || user.role === 'staff') {
+      conn.release();
+      
+      const token = jwt.sign(
+        { id: user.id, username: user.username, email: user.email, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
+      );
+
+      return res.status(200).json({ 
+        message: "Admin/Staff Login successful!", 
+        token: token,
+        user: { id: user.id, username: user.username, role: user.role, email: user.email }
+      });
+    }
+
+    // --- 2FA LOGIC FOR STANDARD USERS (Viewers, etc.) ---
+    await conn.query(`CREATE TABLE IF NOT EXISTS two_factor_tokens (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      code VARCHAR(10) NOT NULL,
+      expires_at DATETIME NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`);
+
+    const twoFactorCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+
+    await conn.query('DELETE FROM two_factor_tokens WHERE user_id = ?', [user.id]);
+    await conn.query('INSERT INTO two_factor_tokens (user_id, code, expires_at) VALUES (?, ?, ?)', [user.id, twoFactorCode, expiresAt]);
+    conn.release();
+
+    const mailOptions = {
+      from: 'inventorysecurityengine@gmail.com', 
+      to: user.email, 
+      subject: 'Your Login Authentication Code',
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+            <div style="max-width: 500px; margin: auto; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <h2 style="color: #6a1b9a; text-align: center;">Login Attempt Detected</h2>
+                <p>Hello <strong>${user.username}</strong>,</p>
+                <p>Your two-factor authentication code is:</p>
+                <h1 style="color: #1e293b; background: #fff; padding: 15px; text-align: center; border-radius: 5px; border: 1px dashed #cbd5e1; letter-spacing: 5px;">${twoFactorCode}</h1>
+                <p>This code will expire in 10 minutes.</p>
+            </div>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ requires2FA: true, userId: user.id, message: "2FA code sent to your email." });
+
+  } catch (error) {
+    console.error("Login Error:", error);
+    res.status(500).json({ error: "Server error during login." });
+  }
+});
+
+// 2.5 VERIFY 2FA API (Step 2: Validate code and return JWT Token)
+router.post('/verify-2fa', async (req, res) => {
+  const { userId, code } = req.body;
+
+  if (!userId || !code) return res.status(400).json({ error: 'User ID and code are required.' });
+
+  try {
+    const conn = await pool.getConnection();
+    const query = `SELECT * FROM two_factor_tokens WHERE user_id = ? AND code = ? AND expires_at >= NOW()`;
+    const results = await conn.query(query, [userId, code]);
+
+    if (results.length === 0) {
+      conn.release();
+      return res.status(401).json({ error: 'Invalid or expired authentication code.' });
+    }
+
+    await conn.query('DELETE FROM two_factor_tokens WHERE user_id = ?', [userId]);
+    const users = await conn.query('SELECT id, username, email, role FROM users WHERE id = ?', [userId]);
+    conn.release();
+    
+    const user = users[0];
     const token = jwt.sign(
-      { 
-        id: user.id, 
-        username: user.username, 
-        email: user.email, 
-        role: user.role
-      },
+      { id: user.id, username: user.username, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
     );
@@ -84,17 +155,12 @@ router.post('/login', async (req, res) => {
     res.status(200).json({ 
       message: "Login successful!", 
       token: token,
-      user: {
-        id: user.id,
-        username: user.username,
-        role: user.role,
-        email: user.email
-      }
+      user: { id: user.id, username: user.username, role: user.role, email: user.email }
     });
 
   } catch (error) {
-    console.error("Login Error:", error);
-    res.status(500).json({ error: "Server error during login." });
+    console.error("Verify 2FA Error:", error);
+    res.status(500).json({ error: "Server error during verification." });
   }
 });
 
@@ -108,12 +174,9 @@ router.post('/forgot-password', async (req, res) => {
 
   try {
     const conn = await pool.getConnection();
-    
-    // Check database for EITHER username OR email
     const users = await conn.query('SELECT id, username, email FROM users WHERE username = ? OR email = ?', [identifier, identifier]);
     const user = users[0];
     
-    // 🚨 Return an explicit 404 error if user does not exist
     if (!user) {
       conn.release();
       return res.status(404).json({ error: 'Username or email does not exist.' });
@@ -135,7 +198,6 @@ router.post('/forgot-password', async (req, res) => {
     await conn.query('INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES (?, ?, ?)', [user.id, resetCode, expiresAt]);
     conn.release();
 
-    // Send the actual email via Nodemailer
     const mailOptions = {
       from: 'inventorysecurityengine@gmail.com', 
       to: user.email, 
@@ -155,8 +217,6 @@ router.post('/forgot-password', async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
-
-    // 🚨 Definitive success message sent back
     res.status(200).json({ message: 'Please check your email inbox for your password reset code.' });
     
   } catch (error) {
