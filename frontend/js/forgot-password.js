@@ -55,7 +55,7 @@ document.getElementById('requestTokenForm').addEventListener('submit', async (e)
     const userCaptcha = document.getElementById('captchaInput').value;
     const captchaError = document.getElementById('captchaError');
     
-    // ✅ Make case-insensitive comparison (Both converted to lowercase)
+    // Make case-insensitive comparison (Both converted to lowercase)
     if (userCaptcha.toLowerCase() !== currentCaptcha.toLowerCase()) {
         captchaError.textContent = "Incorrect CAPTCHA. Please try again.";
         document.getElementById('captchaInput').value = ""; // Clear input
@@ -72,7 +72,6 @@ document.getElementById('requestTokenForm').addEventListener('submit', async (e)
     submitBtn.disabled = true;
 
     try {
-        // ✅ UPDATED URL TO FIX JSON ERROR
         const response = await fetch('http://localhost:5000/api/auth/forgot-password', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -82,7 +81,8 @@ document.getElementById('requestTokenForm').addEventListener('submit', async (e)
         const data = await response.json();
 
         if (response.ok) {
-            alert(`Please check your email inbox for your password reset code.`);
+            // ✅ Will show the success message from the backend
+            alert(data.message);
             
             document.getElementById('requestTokenSection').style.display = 'none';
             document.getElementById('resetPasswordSection').style.display = 'block';
@@ -91,7 +91,8 @@ document.getElementById('requestTokenForm').addEventListener('submit', async (e)
             // Auto-fill the identifier in the second form
             document.getElementById('resetIdentifier').value = identifier;
         } else {
-            alert(data.error || "An error occurred. Account not exist.");
+            // 🚨 Will now display "Username or email does not exist." if a 404 is triggered
+            alert(data.error || "An error occurred.");
             generateCaptcha(); // Refresh captcha on failure
             document.getElementById('captchaInput').value = "";
         }
@@ -124,7 +125,6 @@ document.getElementById('resetPasswordForm').addEventListener('submit', async (e
     submitBtn.disabled = true;
 
     try {
-        // ✅ UPDATED URL TO FIX JSON ERROR
         const response = await fetch('http://localhost:5000/api/auth/reset-password', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -134,9 +134,11 @@ document.getElementById('resetPasswordForm').addEventListener('submit', async (e
         const data = await response.json();
 
        if (response.ok) {
-            alert("Password reset successfully!"); // 👈 Updated alert
+            alert("Password reset successfully!"); 
             
             document.getElementById('requestTokenSection').style.display = 'none';
+            // Optional: redirect to login page here if you want
+            // window.location.href = '/login.html';
         } else {
             alert(data.error || "Invalid token or token expired.");
         }

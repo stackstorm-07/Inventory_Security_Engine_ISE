@@ -8,12 +8,11 @@ const nodemailer = require('nodemailer'); // ✅ IMPORTED NODEMAILER
 const router = express.Router();
 
 // --- EMAIL TRANSPORTER SETUP ---
-// ✅ ADD YOUR GMAIL AND APP PASSWORD HERE
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'inventorysecurityengine@gmail.com', // 👈 Put your real Gmail address here
-    pass: 'qbdlupbfjhzlvefn' // 👈 Put your 16-character app password here (no spaces)
+    user: 'inventorysecurityengine@gmail.com', // Your actual Gmail
+    pass: 'qbdlupbfjhzlvefn' // Your actual App Password
   }
 });
 
@@ -110,14 +109,14 @@ router.post('/forgot-password', async (req, res) => {
   try {
     const conn = await pool.getConnection();
     
-    // ✅ ADDED 'email' to the SELECT query so we know where to send the code
+    // Check database for EITHER username OR email
     const users = await conn.query('SELECT id, username, email FROM users WHERE username = ? OR email = ?', [identifier, identifier]);
     const user = users[0];
     
+    // 🚨 Return an explicit 404 error if user does not exist
     if (!user) {
       conn.release();
-      // ✅ Security best practice: Don't tell hackers if an account exists or not
-      return res.status(200).json({ message: 'If an account exists, a reset code has been sent to the registered email.' });
+      return res.status(404).json({ error: 'Username or email does not exist.' });
     }
 
     await conn.query(`CREATE TABLE IF NOT EXISTS password_reset_tokens (
@@ -136,10 +135,10 @@ router.post('/forgot-password', async (req, res) => {
     await conn.query('INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES (?, ?, ?)', [user.id, resetCode, expiresAt]);
     conn.release();
 
-    // ✅ SEND THE ACTUAL EMAIL VIA NODEMAILER
+    // Send the actual email via Nodemailer
     const mailOptions = {
-      from: 'YOUR_EMAIL@gmail.com', // 👈 Put your Gmail address here
-      to: user.email, // Sends to the user's email pulled from the database
+      from: 'inventorysecurityengine@gmail.com', 
+      to: user.email, 
       subject: 'Your Password Reset Code',
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
@@ -157,8 +156,8 @@ router.post('/forgot-password', async (req, res) => {
 
     await transporter.sendMail(mailOptions);
 
-    // ✅ SECURE RESPONSE: We no longer send the code back to the browser
-    res.status(200).json({ message: 'If an account exists, a reset code has been sent to the registered email.' });
+    // 🚨 Definitive success message sent back
+    res.status(200).json({ message: 'Please check your email inbox for your password reset code.' });
     
   } catch (error) {
     console.error('Forgot Password Error:', error);
