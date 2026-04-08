@@ -88,20 +88,22 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// 3. FORGOT PASSWORD - create reset token
+// 3. FORGOT PASSWORD - create reset token (Accepts Username OR Email)
 router.post('/forgot-password', async (req, res) => {
-  const { username } = req.body;
+  const { identifier } = req.body; // Changed from 'username' to 'identifier'
 
-  if (!username) {
-    return res.status(400).json({ error: 'Username is required.' });
+  if (!identifier) {
+    return res.status(400).json({ error: 'Username or email is required.' });
   }
 
   try {
     const conn = await pool.getConnection();
-    const [user] = await conn.query('SELECT id FROM users WHERE username = ?', [username]);
+    // Check for either username OR email
+    const [user] = await conn.query('SELECT id, username FROM users WHERE username = ? OR email = ?', [identifier, identifier]);
+    
     if (!user) {
       conn.release();
-      return res.status(404).json({ error: 'Username not found.' });
+      return res.status(404).json({ error: 'Account not found.' });
     }
 
     await conn.query(`CREATE TABLE IF NOT EXISTS password_reset_tokens (
@@ -127,12 +129,12 @@ router.post('/forgot-password', async (req, res) => {
   }
 });
 
-// 4. RESET PASSWORD
+// 4. RESET PASSWORD (Matches token against Username OR Email)
 router.post('/reset-password', async (req, res) => {
-  const { username, token, newPassword } = req.body;
+  const { identifier, token, newPassword } = req.body;
 
-  if (!username || !token || !newPassword) {
-    return res.status(400).json({ error: 'Username, reset code, and new password are required.' });
+  if (!identifier || !token || !newPassword) {
+    return res.status(400).json({ error: 'Username/Email, reset code, and new password are required.' });
   }
 
   try {
@@ -141,10 +143,10 @@ router.post('/reset-password', async (req, res) => {
       SELECT pr.id AS token_id, pr.user_id
       FROM password_reset_tokens pr
       JOIN users u ON u.id = pr.user_id
-      WHERE pr.token = ? AND u.username = ? AND pr.expires_at >= NOW()
+      WHERE pr.token = ? AND (u.username = ? OR u.email = ?) AND pr.expires_at >= NOW()
       LIMIT 1
     `;
-    const results = await conn.query(query, [token, username]);
+    const results = await conn.query(query, [token, identifier, identifier]);
 
     if (results.length === 0) {
       conn.release();
@@ -153,6 +155,7 @@ router.post('/reset-password', async (req, res) => {
 
     const resetRecord = results[0];
     const hashedPassword = await bcrypt.hash(newPassword, 10);
+    
     await conn.query('UPDATE users SET password_hash = ? WHERE id = ?', [hashedPassword, resetRecord.user_id]);
     await conn.query('DELETE FROM password_reset_tokens WHERE id = ?', [resetRecord.token_id]);
     conn.release();

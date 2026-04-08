@@ -1,137 +1,149 @@
-document.addEventListener("DOMContentLoaded", () => {
+// --- CAPTCHA GENERATOR LOGIC ---
+let currentCaptcha = "";
 
-  const requestTokenForm = document.getElementById("requestTokenForm");
-  const resetPasswordForm = document.getElementById("resetPasswordForm");
-  const requestTokenSection = document.getElementById("requestTokenSection");
-  const resetPasswordSection = document.getElementById("resetPasswordSection");
-  const usernameInput = document.getElementById("username");
-  const resetUsernameInput = document.getElementById("resetUsername");
-  const resetTokenInput = document.getElementById("resetToken");
-  const newPasswordInput = document.getElementById("newPassword");
-  const confirmPasswordInput = document.getElementById("confirmPassword");
-  const passwordStrength = document.getElementById("passwordStrength");
-
-  // Password Strength Tracker
-  if (newPasswordInput && passwordStrength) {
-    newPasswordInput.addEventListener("input", () => {
-      const val = newPasswordInput.value;
-
-      if (val.length === 0) {
-        passwordStrength.textContent = "";
-      } else if (val.length < 6) {
-        passwordStrength.textContent = "Weak (Too short)";
-        passwordStrength.style.color = "#dc2626";
-      } else if (val.match(/[0-9]/) && val.match(/[a-zA-Z]/)) {
-        if (val.length >= 8 && val.match(/[^a-zA-Z0-9]/)) {
-          passwordStrength.textContent = "Strong";
-          passwordStrength.style.color = "#16a34a";
-        } else {
-          passwordStrength.textContent = "Medium";
-          passwordStrength.style.color = "#d97706";
-        }
-      } else {
-        passwordStrength.textContent = "Weak (Add numbers and letters)";
-        passwordStrength.style.color = "#dc2626";
-      }
-    });
-  }
-
-  // Request Token Form
-  if (requestTokenForm) {
-    requestTokenForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const username = usernameInput.value.trim();
-      const recaptchaResponse = grecaptcha.getResponse();
-
-      if (!username) {
-        alert("Please enter your username.");
+function generateCaptcha() {
+    const canvas = document.getElementById('captchaCanvas');
+    if (!canvas) {
+        console.error("Could not find CAPTCHA canvas!");
         return;
-      }
+    }
+    
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      if (!recaptchaResponse) {
-        alert("Please complete the CAPTCHA.");
-        return;
-      }
+    // Draw a light background
+    ctx.fillStyle = "#f8fafc";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      try {
+    // Generate random 6-character string
+    const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    currentCaptcha = "";
+    for (let i = 0; i < 6; i++) {
+        currentCaptcha += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    // Draw text
+    ctx.font = "bold 24px Arial";
+    ctx.fillStyle = "#1e293b"; // Dark text
+    ctx.fillText(currentCaptcha, 25, 32);
+
+    // Add noise lines to make it a real CAPTCHA
+    for (let i = 0; i < 5; i++) {
+        ctx.beginPath();
+        ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+        ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+        ctx.strokeStyle = "#9d2b8c"; // Purple lines
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+    }
+}
+
+// Call generation immediately 
+generateCaptcha();
+
+// Attach refresh button event
+const refreshBtn = document.getElementById("refreshCaptcha");
+if (refreshBtn) {
+    refreshBtn.addEventListener("click", generateCaptcha);
+}
+
+// --- STEP 1: Request Reset Code ---
+document.getElementById('requestTokenForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Validate CAPTCHA first
+    const userCaptcha = document.getElementById('captchaInput').value;
+    const captchaError = document.getElementById('captchaError');
+    
+    // ✅ Make case-insensitive comparison (Both converted to lowercase)
+    if (userCaptcha.toLowerCase() !== currentCaptcha.toLowerCase()) {
+        captchaError.textContent = "Incorrect CAPTCHA. Please try again.";
+        document.getElementById('captchaInput').value = ""; // Clear input
+        generateCaptcha(); // Generate a new one
+        return; // Stop form submission
+    }
+    
+    captchaError.textContent = ""; // Clear error
+
+    const identifier = document.getElementById('identifier').value;
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    
+    submitBtn.innerText = "Sending...";
+    submitBtn.disabled = true;
+
+    try {
+        // ✅ UPDATED URL TO FIX JSON ERROR
         const response = await fetch('http://localhost:5000/api/auth/forgot-password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username })
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier })
         });
+
         const data = await response.json();
 
-        if (!response.ok) {
-          alert(data.error || 'Unable to request password reset.');
-          grecaptcha.reset();
-          return;
+        if (response.ok) {
+            alert(`Success! Your reset code is: ${data.resetCode}\n\n(In production, this will be emailed silently).`);
+            
+            document.getElementById('requestTokenSection').style.display = 'none';
+            document.getElementById('resetPasswordSection').style.display = 'block';
+            document.getElementById('formSubtitle').innerText = "Enter your reset code and new password.";
+            
+            // Auto-fill the identifier in the second form
+            document.getElementById('resetIdentifier').value = identifier;
+        } else {
+            alert(data.error || "An error occurred. Account might not exist.");
+            generateCaptcha(); // Refresh captcha on failure
+            document.getElementById('captchaInput').value = "";
         }
 
-        alert(data.message + (data.resetCode ? ` Reset code: ${data.resetCode}` : ''));
-        resetUsernameInput.value = username;
-        requestTokenSection.style.display = 'none';
-        resetPasswordSection.style.display = 'block';
-        grecaptcha.reset();
-      } catch (error) {
-        console.error('Forgot password error:', error);
-        alert('Unable to request password reset at this time.');
-        grecaptcha.reset();
-      }
-    });
-  }
+    } catch (err) {
+        alert("System Error: " + err.message);
+        console.error("Full error:", err);
+        generateCaptcha(); // Refresh captcha on failure
+    } finally {
+        submitBtn.innerText = "Send Reset Code";
+        submitBtn.disabled = false;
+    }
+});
 
-  // Reset Password Form
-  if (resetPasswordForm) {
-    resetPasswordForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
+// --- STEP 2: Submit New Password ---
+document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const identifier = document.getElementById('resetIdentifier').value;
+    const token = document.getElementById('resetToken').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
 
-      const username = resetUsernameInput.value.trim();
-      const token = resetTokenInput.value.trim();
-      const newPassword = newPasswordInput.value;
-      const confirmPassword = confirmPasswordInput.value;
+    if (newPassword !== confirmPassword) {
+        return alert("Passwords do not match!");
+    }
 
-      if (!username || !token || !newPassword || !confirmPassword) {
-        alert('Please complete all fields.');
-        return;
-      }
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.innerText = "Updating...";
+    submitBtn.disabled = true;
 
-      if (newPassword !== confirmPassword) {
-        alert('New passwords do not match.');
-        return;
-      }
-
-      if (newPassword.length < 6) {
-        alert('New password must be at least 6 characters long.');
-        return;
-      }
-
-      // Additional strong password check
-      if (!newPassword.match(/[0-9]/) || !newPassword.match(/[a-zA-Z]/)) {
-        alert('Password must contain at least one letter and one number.');
-        return;
-      }
-
-      try {
+    try {
+        // ✅ UPDATED URL TO FIX JSON ERROR
         const response = await fetch('http://localhost:5000/api/auth/reset-password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, token, newPassword })
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier, token, newPassword })
         });
+
         const data = await response.json();
 
-        if (!response.ok) {
-          alert(data.error || 'Unable to reset password.');
-          return;
+        if (response.ok) {
+            alert("Password successfully reset! You will now be redirected to the login page.");
+            window.location.href = 'login.html'; 
+        } else {
+            alert(data.error || "Invalid token or token expired.");
         }
-
-        alert(data.message);
-        window.location.href = "login.html";
-      } catch (error) {
-        console.error('Reset password error:', error);
-        alert('Unable to reset password right now.');
-      }
-    });
-  }
-
+    } catch (err) {
+        alert("An error occurred during password reset.");
+        console.error("Full error:", err);
+    } finally {
+        submitBtn.innerText = "Reset Password";
+        submitBtn.disabled = false;
+    }
 });
