@@ -339,8 +339,25 @@ router.put('/access-control/:id', verifyToken, requireRole('admin'), async (req,
   }
 });
 
+// List active staff members for admin assignment
+router.get('/staff-members', verifyToken, requireRole('admin'), async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const staff = await conn.query(
+      `SELECT id, username, full_name, email FROM users WHERE role = 'staff' AND is_active = 1 ORDER BY full_name`
+    );
+    res.json(staff);
+  } catch (error) {
+    console.error('Error fetching staff members:', error);
+    res.status(500).json({ error: 'Failed to fetch staff members' });
+  } finally {
+    if (conn) conn.release();
+  }
+});
+
 // Get reports data - admin and staff
-router.get('/reports', verifyToken, requireRole('admin', 'staff'), async (req, res) => {
+router.get('/reports', verifyToken, requireRole('admin', 'staff', 'viewer'), async (req, res) => {
   try {
     const conn = await pool.getConnection();
 
@@ -393,9 +410,24 @@ router.get('/reports', verifyToken, requireRole('admin', 'staff'), async (req, r
   }
 });
 
-router.post('/reports/export', verifyToken, requireRole('admin', 'staff'), async (req, res) => {
+router.post('/reports/export', verifyToken, requireRole('admin', 'staff', 'viewer'), async (req, res) => {
+  const { email } = req.body || {};
+
   try {
     const conn = await pool.getConnection();
+    const rows = await conn.query('SELECT email, role FROM users WHERE id = ?', [req.user.id]);
+    const currentUser = rows[0];
+
+    if (!currentUser || !currentUser.email) {
+      conn.release();
+      return res.status(400).json({ error: 'Your account does not have a valid email address on file. Please update your profile.' });
+    }
+
+    const targetEmail = email ? email.trim() : currentUser.email;
+    if (targetEmail !== currentUser.email) {
+      conn.release();
+      return res.status(400).json({ error: 'Email mismatch. The address must match the one stored on your user record.' });
+    }
 
     const inventoryQuery = `
       SELECT
@@ -448,7 +480,7 @@ router.post('/reports/export', verifyToken, requireRole('admin', 'staff'), async
 
     const mailOptions = {
       from: 'inventorysecurityengine@gmail.com',
-      to: req.user.email,
+      to: targetEmail,
       subject: 'Inventory Security Engine Report Export',
       text: 'Please find the exported report attached.',
       attachments: [
