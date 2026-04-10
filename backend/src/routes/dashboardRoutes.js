@@ -188,9 +188,14 @@ router.get('/security-alerts', verifyToken, requireRole('admin', 'staff'), async
   try {
     const conn = await pool.getConnection();
     const query = `
-      SELECT id, title, details, time, asset_id, severity, resolved
-      FROM security_alerts
-      ORDER BY time DESC
+      SELECT s.id, s.title, s.details, s.time, s.asset_id, s.severity, s.resolved
+      FROM security_alerts s
+      JOIN (
+        SELECT title, details, time, asset_id, severity, MIN(id) AS min_id
+        FROM security_alerts
+        GROUP BY title, details, time, asset_id, severity
+      ) AS unique_alerts ON unique_alerts.min_id = s.id
+      ORDER BY s.time DESC
       LIMIT 50
     `;
     const alerts = await conn.query(query);

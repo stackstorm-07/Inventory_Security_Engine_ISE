@@ -94,22 +94,31 @@ document.addEventListener("DOMContentLoaded", () => {
         allAssets = await aRes.json();
         peers = await pRes.json();
 
+        const availableAssets = allAssets.filter((asset) => asset.status === 'available' || !asset.assigned_to);
         orderAsset.innerHTML = '<option value="">Select an asset</option>';
-        allAssets.forEach((asset) => {
-            const opt = document.createElement("option");
-            opt.value = asset.asset_id;
-            opt.textContent = `${asset.asset_id} — ${asset.name} (${asset.status})`;
-            orderAsset.appendChild(opt);
-        });
+        if (!availableAssets.length) {
+            orderAsset.innerHTML = '<option value="">No available assets found</option>';
+        } else {
+            availableAssets.forEach((asset) => {
+                const opt = document.createElement("option");
+                opt.value = asset.asset_id;
+                opt.textContent = `${asset.asset_id} — ${asset.name} (${asset.status})`;
+                orderAsset.appendChild(opt);
+            });
+        }
 
         tradePeer.innerHTML = '<option value="">Select a viewer</option>';
-        peers.forEach((p) => {
-            const opt = document.createElement("option");
-            opt.value = p.id;
-            opt.textContent = `${p.username} (${p.full_name || "no name"})`;
-            opt.dataset.peer = JSON.stringify(p);
-            tradePeer.appendChild(opt);
-        });
+        if (!peers.length) {
+            tradePeer.innerHTML = '<option value="">No other viewers found</option>';
+        } else {
+            peers.forEach((p) => {
+                const opt = document.createElement("option");
+                opt.value = p.id;
+                opt.textContent = `${p.username} (${p.full_name || "no name"})`;
+                opt.dataset.peer = JSON.stringify(p);
+                tradePeer.appendChild(opt);
+            });
+        }
 
         rebuildOfferOptions();
         rebuildRequestOptions();
@@ -117,7 +126,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function rebuildOfferOptions() {
         offerAsset.innerHTML = '<option value="">Select your asset</option>';
-        allAssets.filter(assetMatchesMe).forEach((asset) => {
+        const userAssets = allAssets.filter(assetMatchesMe);
+        if (!userAssets.length) {
+            offerAsset.innerHTML = '<option value="">No assets currently assigned to you</option>';
+            return;
+        }
+        userAssets.forEach((asset) => {
             const opt = document.createElement("option");
             opt.value = asset.asset_id;
             opt.textContent = `${asset.asset_id} — ${asset.name}`;
@@ -128,10 +142,18 @@ document.addEventListener("DOMContentLoaded", () => {
     function rebuildRequestOptions() {
         const selected = tradePeer.value;
         requestAsset.innerHTML = '<option value="">Select their asset</option>';
-        if (!selected) return;
+        if (!selected) {
+            return;
+        }
         const peer = peers.find((p) => String(p.id) === String(selected));
         if (!peer) return;
-        allAssets.filter((a) => assetMatchesPeer(a, peer)).forEach((asset) => {
+
+        const peerAssets = allAssets.filter((a) => assetMatchesPeer(a, peer));
+        if (!peerAssets.length) {
+            requestAsset.innerHTML = '<option value="">No assets assigned to this viewer</option>';
+            return;
+        }
+        peerAssets.forEach((asset) => {
             const opt = document.createElement("option");
             opt.value = asset.asset_id;
             opt.textContent = `${asset.asset_id} — ${asset.name}`;

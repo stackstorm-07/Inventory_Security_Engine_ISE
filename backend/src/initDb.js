@@ -60,9 +60,18 @@ async function initializeDatabase() {
         severity ENUM('low', 'medium', 'high', 'critical') DEFAULT 'medium',
         resolved BOOLEAN DEFAULT FALSE,
         resolved_at DATETIME NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_alert (title, time, asset_id, severity)
       )
     `);
+
+    try {
+      await conn.query('ALTER TABLE security_alerts ADD UNIQUE KEY unique_alert (title, time, asset_id, severity)');
+    } catch (err) {
+      if (err.code !== 'ER_DUP_KEYNAME' && err.code !== 'ER_DUP_ENTRY') {
+        throw err;
+      }
+    }
 
     // Create assets table for inventory management
     await conn.query(`
@@ -249,7 +258,10 @@ async function insertSampleData(conn) {
       ('AST-045', 'Samsung Monitor 27"', 'Monitor', 'Warehouse A', 'available', NULL),
       ('AST-023', 'HP Printer LaserJet', 'Printer', 'Service Center', 'maintenance', NULL),
       ('AST-067', 'Apple iPad Pro', 'Tablet', 'Executive Office', 'checked_out', 'Sarah Wilson'),
-      ('AST-089', 'Lenovo ThinkPad', 'Laptop', 'Warehouse B', 'available', NULL)
+      ('AST-089', 'Lenovo ThinkPad', 'Laptop', 'Warehouse B', 'available', NULL),
+      ('AST-100', 'HP EliteBook 840', 'Laptop', 'Viewer Locker', 'available', 'VU2421001'),
+      ('AST-101', 'Apple iPad Mini', 'Tablet', 'Viewer Desk', 'available', 'VU2421002'),
+      ('AST-102', 'Logitech Keyboard', 'Peripheral', 'Viewer Workspace', 'available', 'VU2421003')
     `);
 
     // Seed sample viewer orders and trades

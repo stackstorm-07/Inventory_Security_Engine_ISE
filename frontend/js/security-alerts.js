@@ -67,16 +67,35 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    function dedupeAlerts(alerts) {
+        const seen = new Set();
+        return (alerts || []).filter((alert) => {
+            const key = [
+                alert.title,
+                alert.time,
+                alert.asset_id || '',
+                alert.severity,
+                alert.details,
+                alert.resolved
+            ].join('||');
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+    }
+
     function displayAlerts(alerts) {
-        if (!alerts || alerts.length === 0) {
+        const uniqueAlerts = dedupeAlerts(alerts);
+        if (!uniqueAlerts || uniqueAlerts.length === 0) {
             alertsContainer.innerHTML = '<div style="text-align: center; padding: 2rem;">No security alerts found.</div>';
             return;
         }
 
-        alertsContainer.innerHTML = alerts.map(alert => {
-            const time = new Date(alert.time).toLocaleString();
+        alertsContainer.innerHTML = uniqueAlerts.map(alert => {
+            const time = alert.time ? new Date(alert.time).toLocaleString() : 'Unknown';
             const severityClass = `severity-${alert.severity}`;
-            const actionButtons = isAdmin
+            const resolvedTag = alert.resolved ? '<span class="resolved-badge">Resolved</span>' : '';
+            const actionButtons = isAdmin && !alert.resolved
                 ? `
                     <div class="alert-actions">
                         <button class="action-btn resolve-btn" data-action="resolve" data-alert-id="${alert.id}">Resolve</button>
@@ -92,7 +111,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         <div class="alert-details">${alert.details}</div>
                         <div class="alert-time">${time} ${alert.asset_id ? `- Asset ID: ${alert.asset_id}` : ''}</div>
                     </div>
-                    <div class="alert-severity ${severityClass}">${alert.severity.toUpperCase()}</div>
+                    <div>
+                        <div class="alert-severity ${severityClass}">${alert.severity.toUpperCase()}</div>
+                        ${resolvedTag}
+                    </div>
                     ${actionButtons}
                 </div>
             `;
