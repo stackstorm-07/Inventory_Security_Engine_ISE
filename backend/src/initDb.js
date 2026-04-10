@@ -284,6 +284,19 @@ async function insertSampleData(conn) {
       ((SELECT id FROM users WHERE username = 'VU2421002'), 'Asset assignment does not update', 'system_error', 'high', 'I submitted an order but my asset still shows as not assigned.', 'in_progress', (SELECT id FROM users WHERE username = 'AU0000001'))
     `);
 
+
+    // Create contact_submissions table for homepage contact form
+    await conn.query(`
+      CREATE TABLE IF NOT EXISTS contact_submissions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        phone VARCHAR(30),
+        query TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
   } catch (error) {
     console.error('Error inserting sample data:', error);
   }

@@ -4,42 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inventory Security Engine – ISE</title>
-  
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
-  
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
+  <!-- ══ NAVBAR ════════════════════════════════════════════════════ -->
   <nav>
     <a class="nav-logo" href="#">
       <img src="css/logo.png" alt="ISE Logo" />
-      <div class="nav-logo-text">
-      </div>
     </a>
-
     <ul class="nav-links">
       <li><a href="#features">Features</a></li>
       <li><a href="#security">Security</a></li>
       <li><a href="#team">Team</a></li>
       <li><a href="#contact">Contact Us</a></li>
     </ul>
-
     <div class="nav-actions">
-      <a href="login.html" class="btn-ghost">Sign In</a>
+      <a href="login.html"  class="btn-ghost">Sign In</a>
       <a href="signup.html" class="btn-primary">Sign Up</a>
     </div>
   </nav>
-    <h1>
-      Inventory Security Engine
-    </h1>
-    
-    <p class="hero-sub">
-      ISE is a full-stack inventory system built with enterprise-grade cybersecurity
-      : RBAC, hashed credentials, and real-time security alerts. 
-    </p>
 
+  <!-- ══ HERO ══════════════════════════════════════════════════════ -->
+  <div class="hero-section">
+    <h1>Inventory Security Engine</h1>
+    <p class="hero-sub">
+      A full-stack inventory system with enterprise-grade cybersecurity:
+      RBAC, bcrypt-hashed credentials, real-time security alerts, and
+      audit trails built for Indian businesses.
+    </p>
     <div class="hero-stats">
       <div class="stat"><div class="stat-num">23+</div><div class="stat-label">Security Controls</div></div>
       <div class="stat"><div class="stat-num">bcrypt</div><div class="stat-label">Password Hashing</div></div>
@@ -50,79 +45,77 @@
 
   <hr class="divider" />
 
+  <!-- ══ FEATURES ══════════════════════════════════════════════════ -->
   <section id="features">
     <div class="reveal">
       <p class="section-label">Core Capabilities</p>
-      <h2 class="section-title">Everything you need to<br />manage & secure assets</h2>
-      <p class="section-sub">
-        Built from the ground up with cybersecurity at its core.
-      </p>
+      <h2 class="section-title">Everything you need to manage &amp; secure assets</h2>
+      <p class="section-sub">Built from the ground up with cybersecurity at its core.</p>
     </div>
 
     <div class="features-grid stagger reveal">
-      <div class="feat-card box-1" style="--i:0">
+      <div class="feat-card" onclick="this.classList.toggle('flipped')" style="--i:0">
         <div class="feat-icon">🔐</div>
-        <h3>Authentication & Authorization</h3>
+        <h3>Authentication &amp; Authorization</h3>
         <img src="css/Auth.webp" alt="Security Auth" class="feat-image" />
         <p>Secure login with bcrypt hashing, JWT sessions, Role-Based Access Control for Admin, Staff and Viewer roles.</p>
+        <span class="flip-hint"></span>
       </div>
-
-      <div class="feat-card box-2" style="--i:1">
+      <div class="feat-card" onclick="this.classList.toggle('flipped')" style="--i:1">
         <div class="feat-icon">📦</div>
         <h3>Asset Inventory Management</h3>
         <img src="css/side-image.jpg" alt="Inventory" class="feat-image" />
-        <p>Track all equipment across your organization with real-time status: Operational, and Maintenance.</p>
+        <p>Track all equipment across your organization with real-time status: Operational and Maintenance.</p>
+        <span class="flip-hint"></span>
       </div>
-
-      <div class="feat-card box-3" style="--i:2">
+      <div class="feat-card" onclick="this.classList.toggle('flipped')" style="--i:2">
         <div class="feat-icon">🚨</div>
         <h3>Security Alerts Dashboard</h3>
         <img src="css/alert.png" alt="Alerts" class="feat-image" />
-        <p>Detect unauthorized access attempts, failed login spikes, and system anomalies with instant alert logging.</p>
+        <p>Detect unauthorized access attempts, failed login spikes, and anomalies with instant alert logging.</p>
+        <span class="flip-hint"></span>
       </div>
-
-      <div class="feat-card box-4" style="--i:3">
+      <div class="feat-card" onclick="this.classList.toggle('flipped')" style="--i:3">
         <div class="feat-icon">📋</div>
-        <h3>Activity Logs & Audit Trail</h3>
+        <h3>Activity Logs &amp; Audit Trail</h3>
         <img src="css/Audit.webp" alt="Logs" class="feat-image" />
-        <p>Every action: login, asset change, access attempt is timestamped and stored for full accountability.</p>
+        <p>Every action — login, asset change, access attempt — is timestamped and stored for full accountability.</p>
+        <span class="flip-hint"></span>
       </div>
-
-      <div class="feat-card box-5" style="--i:4">
+      <div class="feat-card" onclick="this.classList.toggle('flipped')" style="--i:4">
         <div class="feat-icon">🛡️</div>
         <h3>SQL Injection Protection</h3>
         <img src="css/Sql.png" alt="Protection" class="feat-image" />
         <p>Parameterized queries, rate limiting, and input sanitization defend against common web attack vectors.</p>
+        <span class="flip-hint"></span>
       </div>
-    </div>
-
-    <div class="feat-card box-6" style="--i:4">
+      <div class="feat-card" onclick="this.classList.toggle('flipped')" style="--i:5">
         <div class="feat-icon">👥</div>
         <h3>Role-Based Access Control</h3>
-        <img src="css/RBAC.jpg" alt="Protection" class="feat-image" />
-        <p>Role-Based Access Control for Admin, Staff and Viewer roles.</p>
+        <img src="css/RBAC.jpg" alt="RBAC" class="feat-image" />
+        <p>Admin, Staff, and Viewer roles with granular permission boundaries enforced server-side.</p>
+        <span class="flip-hint"></span>
       </div>
     </div>
   </section>
 
   <hr class="divider" />
 
+  <!-- ══ SECURITY ═══════════════════════════════════════════════════ -->
   <section id="security">
     <div class="showcase-wrap">
       <div class="reveal">
         <p class="section-label">Security Dashboard</p>
-        <p class="section-sub">
-          Track items, resolve incidents, and monitor your security posture in real time: all from a single pane of glass.
-        </p>
-
-        <div class="security-list stagger reveal" style="margin-top:2rem">
+        <h2 class="section-title">Full visibility.<br/>Zero blind spots.</h2>
+        <p class="section-sub">Track items, resolve incidents, and monitor your security posture in real time all from a single pane of glass.</p>
+        <div class="security-list stagger reveal" style="margin-top:1.75rem">
           <div class="sec-item" style="--i:0"><span class="sec-item-dot"></span>Two-Factor Authentication (2FA)</div>
           <div class="sec-item" style="--i:1"><span class="sec-item-dot"></span>Encrypted Data Transmission (HTTPS)</div>
-          <div class="sec-item" style="--i:2"><span class="sec-item-dot"></span>Session & Device Management</div>
-          <div class="sec-item" style="--i:3"><span class="sec-item-dot"></span>Hashing</div>
+          <div class="sec-item" style="--i:2"><span class="sec-item-dot"></span>Session &amp; Device Management</div>
+          <div class="sec-item" style="--i:3"><span class="sec-item-dot"></span>Hashing (bcrypt)</div>
           <div class="sec-item" style="--i:4"><span class="sec-item-dot"></span>Intrusion Detection System (IDS)</div>
-            <div class="sec-item" style="--i:5"><span class="sec-item-dot"></span>Role-Based Access Control (RBAC)</div>
-            <div class="sec-item" style="--i:6"><span class="sec-item-dot"></span>Real-Time Security Alerts</div>
+          <div class="sec-item" style="--i:5"><span class="sec-item-dot"></span>Role-Based Access Control (RBAC)</div>
+          <div class="sec-item" style="--i:6"><span class="sec-item-dot"></span>Real-Time Security Alerts</div>
         </div>
       </div>
 
@@ -137,45 +130,16 @@
             </div>
           </div>
           <div class="mock-stats">
-            <div class="mock-stat">
-              <div class="mock-stat-num clr-blue">5</div>
-              <div class="mock-stat-label">Items Tracked</div>
-            </div>
-            <div class="mock-stat">
-              <div class="mock-stat-num clr-yellow">1</div>
-              <div class="mock-stat-label">Active Alerts</div>
-            </div>
-            <div class="mock-stat">
-              <div class="mock-stat-num clr-green">4</div>
-              <div class="mock-stat-label">Resolved Today</div>
-            </div>
-            <div class="mock-stat">
-              <div class="mock-stat-num clr-green">99.9</div>
-              <div class="mock-stat-label">Uptime (hrs)</div>
-            </div>
+            <div class="mock-stat"><div class="mock-stat-num clr-blue">5</div><div class="mock-stat-label">Items Tracked</div></div>
+            <div class="mock-stat"><div class="mock-stat-num clr-yellow">1</div><div class="mock-stat-label">Active Alerts</div></div>
+            <div class="mock-stat"><div class="mock-stat-num clr-green">4</div><div class="mock-stat-label">Resolved Today</div></div>
+            <div class="mock-stat"><div class="mock-stat-num clr-green">99.9</div><div class="mock-stat-label">Uptime (hrs)</div></div>
           </div>
-
-          <div style="margin-top:1rem">
-            <div class="mock-bar-row">
-              <span class="mock-bar-label">Auth</span>
-              <div class="mock-bar-track"><div class="mock-bar-fill" style="width:92%;background:var(--accent)"></div></div>
-              <span style="font-size:0.7rem;color:var(--muted)">92%</span>
-            </div>
-            <div class="mock-bar-row">
-              <span class="mock-bar-label">Hashing</span>
-              <div class="mock-bar-track"><div class="mock-bar-fill" style="width:88%;background:var(--accent2)"></div></div>
-              <span style="font-size:0.7rem;color:var(--muted)">88%</span>
-            </div>
-            <div class="mock-bar-row">
-              <span class="mock-bar-label">RBAC</span>
-              <div class="mock-bar-track"><div class="mock-bar-fill" style="width:74%;background:#ffd166"></div></div>
-              <span style="font-size:0.7rem;color:var(--muted)">74%</span>
-            </div>
-            <div class="mock-bar-row">
-              <span class="mock-bar-label">2FA</span>
-              <div class="mock-bar-track"><div class="mock-bar-fill" style="width:60%;background:var(--danger)"></div></div>
-              <span style="font-size:0.7rem;color:var(--muted)">60%</span>
-            </div>
+          <div>
+            <div class="mock-bar-row"><span class="mock-bar-label">Auth</span><div class="mock-bar-track"><div class="mock-bar-fill" style="width:92%;background:var(--accent)"></div></div><span style="font-size:0.7rem;color:var(--muted-light)">92%</span></div>
+            <div class="mock-bar-row"><span class="mock-bar-label">Hashing</span><div class="mock-bar-track"><div class="mock-bar-fill" style="width:88%;background:var(--accent2)"></div></div><span style="font-size:0.7rem;color:var(--muted-light)">88%</span></div>
+            <div class="mock-bar-row"><span class="mock-bar-label">RBAC</span><div class="mock-bar-track"><div class="mock-bar-fill" style="width:74%;background:#f59e0b"></div></div><span style="font-size:0.7rem;color:var(--muted-light)">74%</span></div>
+            <div class="mock-bar-row"><span class="mock-bar-label">2FA</span><div class="mock-bar-track"><div class="mock-bar-fill" style="width:60%;background:var(--danger)"></div></div><span style="font-size:0.7rem;color:var(--muted-light)">60%</span></div>
           </div>
         </div>
       </div>
@@ -184,51 +148,129 @@
 
   <hr class="divider" />
 
+  <!-- ══ TEAM ═══════════════════════════════════════════════════════ -->
   <section id="team">
-    <div class="reveal" style="text-align:center">
+    <div class="reveal">
       <h2 class="section-title">Meet the Team</h2>
-      <p class="section-sub" style="margin:0 auto">
-        Students at Ahmedabad University building the future of secure inventory management.
-      </p>
+      <p class="section-sub">Students at Ahmedabad University building the future of secure inventory management.</p>
     </div>
-
     <div class="team-grid stagger reveal">
+
       <div class="team-card" style="--i:0">
-        <div class="team-avatar">👨‍💻</div>
+        <!-- Place your photo as css/ankit.jpg — fallback emoji shown if missing -->
+        <img src="css/ankit.jpg" alt="Ankit Kumar"
+             class="team-avatar"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <div class="team-avatar-emoji" style="display:none">👨‍💻</div>
         <h4>Ankit Kumar</h4>
         <div class="roll">AU2420147</div>
       </div>
+
       <div class="team-card" style="--i:1">
-        <div class="team-avatar">👨‍💻</div>
+        <img src="css/milan.jpg" alt="Milan Shah"
+             class="team-avatar"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <div class="team-avatar-emoji" style="display:none">👨‍💻</div>
         <h4>Milan Jayesh Shah</h4>
         <div class="roll">AU2420195</div>
       </div>
+
       <div class="team-card" style="--i:2">
-        <div class="team-avatar">👨‍💻</div>
+        <img src="css/dev.jpg" alt="Dev Shah"
+             class="team-avatar"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <div class="team-avatar-emoji" style="display:none">👨‍💻</div>
         <h4>Dev Shah</h4>
         <div class="roll">AU2420165</div>
       </div>
+
       <div class="team-card" style="--i:3">
-        <div class="team-avatar">👩‍💻</div>
+        <img src="css/devshree.jpg" alt="Devshree Patel"
+             class="team-avatar"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <div class="team-avatar-emoji" style="display:none">👩‍💻</div>
         <h4>Devshree Patel</h4>
         <div class="roll">AU2420116</div>
       </div>
+
     </div>
   </section>
 
   <hr class="divider" />
 
-  <footer id="contact">
+  <!-- ══ CONTACT FORM ═══════════════════════════════════════════════ -->
+  <section id="contact" style="padding: 3.5rem 0 0;">
+    <div id="contact-section">
+      <div class="contact-wrapper">
+
+        <!-- Left: info -->
+        <div class="contact-info">
+          <p class="section-label">Contact Us</p>
+          <h2>Get in touch with<br/>the ISE team</h2>
+          <p>Have a question, feedback, or want to learn more about the project? Fill in the form and we'll get back to you and you'll receive a confirmation email right away.</p>
+
+          <div class="contact-detail">
+            <div class="contact-detail-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </div>
+            <a href="mailto:inventorysecurityengine@gmail.com">inventorysecurityengine@gmail.com</a>
+          </div>
+
+          <div class="contact-detail">
+            <div class="contact-detail-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.08 3.18 2 2 0 0 1 3.07 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <a href="tel:+919199563634">+91 9199563634</a>
+          </div>
+
+          <div class="contact-detail">
+            <div class="contact-detail-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77A5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </div>
+            <a href="https://github.com/stackstorm-07/Inventory_Security_Engine_ISE" target="_blank">GitHub Repository</a>
+          </div>
+        </div>
+
+        <!-- Right: form -->
+        <div>
+          <div id="form-msg" class="form-msg"></div>
+          <div class="contact-form" id="contactForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="cf-name">Your Name</label>
+                <input type="text" id="cf-name" placeholder="e.g. Ankit Kumar" required />
+              </div>
+              <div class="form-group">
+                <label for="cf-email">Email Address</label>
+                <input type="email" id="cf-email" placeholder="you@gmail.com" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="cf-phone">Phone Number</label>
+              <input type="tel" id="cf-phone" placeholder="+91 XXXXX XXXXX" />
+            </div>
+            <div class="form-group">
+              <label for="cf-query">Your Query / Message</label>
+              <textarea id="cf-query" placeholder="Tell us what you'd like to know or share…" required></textarea>
+            </div>
+            <button class="btn-submit" id="submitBtn" onclick="submitContact()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Send Message
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ════════════════════════════════════════════════════ -->
+  <footer>
     <div class="footer-inner">
       <div class="footer-brand">
         <img src="css/logo.png" alt="ISE Logo" />
-        <p>
-          Inventory Security Engine: a secure, full-stack web application
-          demonstrating how cybersecurity controls can be integrated into
-          real-world inventory management systems.
-        </p>
+        <p>Inventory Security Engine a secure, full-stack web application demonstrating how cybersecurity controls integrate into real-world inventory management.</p>
       </div>
-
       <div class="footer-col">
         <h5>Security</h5>
         <ul>
@@ -239,25 +281,25 @@
           <li><a href="#">IDS</a></li>
         </ul>
       </div>
-
       <div class="footer-col">
         <h5>Project</h5>
         <ul>
           <li><a href="https://github.com/stackstorm-07/Inventory_Security_Engine_ISE" target="_blank">GitHub Repository</a></li>
           <li><a href="#team">Meet the Team</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="login.html">Login</a></li>
         </ul>
       </div>
     </div>
-
     <div class="footer-bottom">
-      <p>© 2026 Inventory Security Engine — Group 09, Ahmedabad University. All rights reserved.</p>
+      <p>© 2026 Inventory Security Engine Group 09, Ahmedabad University. All rights reserved.</p>
       <div class="contact-links">
-        <a href="mailto:ankit.k@ahduni.edu.in">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <a href="mailto:inventorysecurityengine@gmail.com">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
           inventorysecurityengine@gmail.com
         </a>
         <a href="tel:+919199563634">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.08 3.18 2 2 0 0 1 3.07 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.08 3.18 2 2 0 0 1 3.07 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
           +91 9199563634
         </a>
       </div>
@@ -265,21 +307,68 @@
   </footer>
 
   <script>
-    // Scroll reveal animation script
+    // ── Scroll Reveal ──────────────────────────────────────────────
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (e.isIntersecting) {
           e.target.classList.add('visible');
           if (e.target.classList.contains('stagger')) {
             [...e.target.children].forEach((child, i) => {
-              child.style.transitionDelay = `${i * 80}ms`;
+              child.style.transitionDelay = `${i * 90}ms`;
             });
           }
         }
       });
-    }, { threshold: 0.12 });
-
+    }, { threshold: 0.1 });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // ── Contact Form Submit ────────────────────────────────────────
+    async function submitContact() {
+      const name  = document.getElementById('cf-name').value.trim();
+      const email = document.getElementById('cf-email').value.trim();
+      const phone = document.getElementById('cf-phone').value.trim();
+      const query = document.getElementById('cf-query').value.trim();
+      const msgEl = document.getElementById('form-msg');
+      const btn   = document.getElementById('submitBtn');
+
+      msgEl.className = 'form-msg';
+      msgEl.textContent = '';
+
+      if (!name || !email || !query) {
+        msgEl.className = 'form-msg error';
+        msgEl.textContent = 'Please fill in Name, Email, and Query before submitting.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      try {
+        const res = await fetch('/api/auth/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, phone, query })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          msgEl.className = 'form-msg success';
+          msgEl.textContent = '✅ Message sent! A confirmation email has been sent to ' + email;
+          document.getElementById('cf-name').value  = '';
+          document.getElementById('cf-email').value = '';
+          document.getElementById('cf-phone').value = '';
+          document.getElementById('cf-query').value = '';
+        } else {
+          throw new Error(data.error || 'Submission failed.');
+        }
+      } catch (err) {
+        msgEl.className = 'form-msg error';
+        msgEl.textContent = '❌ ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Message';
+      }
+    }
   </script>
 </body>
 </html>

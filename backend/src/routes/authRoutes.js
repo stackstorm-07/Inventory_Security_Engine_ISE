@@ -263,4 +263,45 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
+
+// 5. CONTACT FORM — saves to DB and sends emails
+router.post("/contact", async (req, res) => {
+  const { name, email, phone, query } = req.body;
+
+  if (!name || !email || !query) {
+    return res.status(400).json({ error: "Name, email, and query are required." });
+  }
+
+  try {
+    const conn = await pool.getConnection();
+    await conn.query(
+      "INSERT INTO contact_submissions (name, email, phone, query) VALUES (?, ?, ?, ?)",
+      [name, email, phone || null, query]
+    );
+    conn.release();
+
+    const teamMail = {
+      from: "inventorysecurityengine@gmail.com",
+      to:   "inventorysecurityengine@gmail.com",
+      subject: "[ISE Contact] New message from " + name,
+      html: "<div style=\"font-family:sans-serif;padding:20px\"><h2>New Contact: " + name + "</h2><p><b>Email:</b> " + email + "</p><p><b>Phone:</b> " + (phone || "N/A") + "</p><p><b>Query:</b> " + query + "</p></div>"
+    };
+
+    const confirmMail = {
+      from: "inventorysecurityengine@gmail.com",
+      to:   email,
+      subject: "We received your message — ISE Team",
+      html: "<div style=\"font-family:sans-serif;padding:20px\"><h2>Hi " + name + ", we got your message!</h2><p>Thank you for contacting the Inventory Security Engine team. We will get back to you soon.</p><p><b>Your message:</b> " + query + "</p><p style=\"margin-top:20px;color:#64748b\">— Group 09, Ahmedabad University 2026</p></div>"
+    };
+
+    await transporter.sendMail(teamMail);
+    await transporter.sendMail(confirmMail);
+
+    res.status(200).json({ message: "Message received and confirmation sent." });
+  } catch (error) {
+    console.error("Contact Form Error:", error);
+    res.status(500).json({ error: "Failed to process your message." });
+  }
+});
+
 module.exports = router;
