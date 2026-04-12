@@ -9,8 +9,8 @@ const router = express.Router();
 const reportMailer = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'inventorysecurityengine@gmail.com',
-    pass: 'qbdlupbfjhzlvefn'
+    user: process.env.ISE_EMAIL,
+    pass: process.env.ISE_EMAIL_PASSWORD
   }
 });
 

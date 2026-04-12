@@ -172,12 +172,20 @@ async function insertSampleData(conn) {
   try {
     const bcrypt = require('bcrypt');
 
+     // Validate required environment variables
+    const requiredEnvVars = ['ADMIN_PASSWORD', 'STAFF_PASSWORD', 'VIEWER_PASSWORD'];
+    const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+ 
+    if (missingVars.length > 0) {
+      throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+    }
+
     // Remove old default admin
     await conn.query(`DELETE FROM users WHERE username = 'admin'`);
 
     // Seed admin users
     const saltRounds = 10;
-    const adminPassword = await bcrypt.hash('380011', saltRounds);
+    const adminPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, saltRounds);
     const adminUsers = [
       { full_name: 'Administrator 1', username: 'AU2420148' },
       { full_name: 'Administrator 2', username: 'AU2420149' },
@@ -192,7 +200,7 @@ async function insertSampleData(conn) {
     );
 
     // Seed staff users
-    const staffPassword = await bcrypt.hash('380010', saltRounds);
+    const staffPassword = await bcrypt.hash(process.env.STAFF_PASSWORD, saltRounds);
     const staffUsers = [
       { full_name: 'Staff Member 1', username: 'AU0000001' },
       { full_name: 'Staff Member 2', username: 'AU0000002' },
@@ -216,7 +224,7 @@ async function insertSampleData(conn) {
     );
 
     // Seed viewer users
-    const viewerPassword = await bcrypt.hash('viewer123', saltRounds);
+    const viewerPassword = await bcrypt.hash(process.env.VIEWER_PASSWORD, saltRounds);
     const viewerUsers = [
       { full_name: 'Viewer User 1', username: 'VU2421001' },
       { full_name: 'Viewer User 2', username: 'VU2421002' },

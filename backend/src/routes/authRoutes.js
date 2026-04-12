@@ -11,8 +11,8 @@ const router = express.Router();
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'inventorysecurityengine@gmail.com', // Your actual Gmail
-    pass: 'qbdlupbfjhzlvefn' // Your actual App Password
+    user: process.env.ISE_EMAIL, // Your actual Gmail
+    pass: process.env.ISE_EMAIL_PASSWORD, // Your actual App Password
   }
 });
 
