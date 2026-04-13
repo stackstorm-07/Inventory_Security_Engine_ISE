@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const API_BASE = process.env.API_BASE_URL || 'http://localhost:5000';
     const logoutBtn = document.getElementById("logoutBtn");
     const complaintForm = document.getElementById("complaintForm");
     const submitBtn = document.getElementById("submitBtn");
@@ -77,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
             submitBtn.textContent = "Submitting...";
 
             try {
-                const response = await fetch('http://localhost:5000/api/dashboard/complaints', {
+                const response = await fetch(`${API_BASE}/api/dashboard/complaints`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -119,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function loadUserComplaints() {
         try {
-            const response = await fetch('http://localhost:5000/api/dashboard/complaints', {
+            const response = await fetch(`${API_BASE}/api/dashboard/complaints`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -179,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function loadAllComplaints() {
         try {
-            const response = await fetch('http://localhost:5000/api/dashboard/complaints', {
+            const response = await fetch(`${API_BASE}/api/dashboard/complaints`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,

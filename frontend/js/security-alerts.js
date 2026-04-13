@@ -33,9 +33,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    const API = process.env.API_BASE_URL || 'http://localhost:5000';
+    const API_BASE = API;
+
     async function loadSecurityAlerts() {
         try {
-            const response = await fetch('http://localhost:5000/api/dashboard/security-alerts', {
+            const response = await fetch(`${API}/api/dashboard/security-alerts`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -142,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const resolved = action === 'resolve';
         try {
-            const response = await fetch(`http://localhost:5000/api/dashboard/security-alerts/${alertId}`, {
+            const response = await fetch(`${API_BASE}/api/dashboard/security-alerts/${alertId}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,

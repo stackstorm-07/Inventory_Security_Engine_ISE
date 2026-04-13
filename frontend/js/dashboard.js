@@ -142,9 +142,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (statResolved) statResolved.innerText = availableCount;
     }
 
+    const API_BASE = process.env.API_BASE_URL || 'http://localhost:5000';
+
     async function loadDashboardData() {
         try {
-            const response = await fetch('http://localhost:5000/api/dashboard/assets', {
+            const response = await fetch(`${API_BASE}/api/dashboard/assets`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -210,7 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const mappedStatus = status.toLowerCase() === 'maintenance' ? 'maintenance' : 'available';
 
             try {
-                const response = await fetch('http://localhost:5000/api/dashboard/assets', {
+                const response = await fetch(`${process.env.API_URL}/api/dashboard/assets`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -258,7 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if(confirm("Confirm removal from database?")) {
             try {
-                const response = await fetch(`http://localhost:5000/api/dashboard/assets/${encodeURIComponent(assetId)}`, {
+                const response = await fetch(`${API_BASE}/api/dashboard/assets/${encodeURIComponent(assetId)}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -296,7 +298,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
         try {
-            const response = await fetch(`http://localhost:5000/api/dashboard/assets/${encodeURIComponent(assetId)}`, {
+            const response = await fetch(`${API_BASE}/api/dashboard/assets/${encodeURIComponent(assetId)}`, {
                 method: 'PATCH',
                 headers: {
                     'Authorization': `Bearer ${token}`,

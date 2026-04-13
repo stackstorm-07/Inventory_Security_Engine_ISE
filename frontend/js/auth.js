@@ -180,7 +180,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const userData = { fullName: fullNameInput.value, username: usernameInput.value, email: emailInput.value, phone: phoneInput.value, password: passwordInput.value };
 
-      fetch("http://localhost:5000/api/auth/signup", {
+      const API_BASE = process.env.API_BASE_URL || 'http://localhost:5000';
+fetch(`${API_BASE}/api/auth/signup`, {
         method:  "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(userData)
       })
       .then(r => r.json())
@@ -216,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
       submitBtn.innerText = "Checking...";
       submitBtn.disabled = true;
 
-      fetch("http://localhost:5000/api/auth/login", {
+      fetch(`${API_BASE}/api/auth/login`, {
         method:  "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ usernameOrEmail: loginId, password: loginPass })
       })
       .then(r => r.json())
@@ -260,7 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
       submitBtn.innerText = "Verifying...";
       submitBtn.disabled = true;
 
-      fetch("http://localhost:5000/api/auth/verify-2fa", {
+      fetch(`${API_BASE}/api/auth/verify-2fa`, {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: tempUserId, code: code })
       })
       .then(r => r.json())
@@ -326,7 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!email) { alert("Please enter your email address."); return; }
 
       try {
-        const res  = await fetch("http://localhost:5000/api/auth/forgot-password", {
+        const res  = await fetch(`${API_BASE}/api/auth/forgot-password`, {
           method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ identifier: email }) 
         });
         const data = await res.json();
@@ -355,7 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (newPassword.length < 6)     { alert("New password must be at least 6 characters."); return; }
 
       try {
-        const res  = await fetch("http://localhost:5000/api/auth/reset-password", {
+        const res  = await fetch(`${API_BASE}/api/auth/reset-password`, {
           method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ identifier: email, token, newPassword })
         });
         const data = await res.json();

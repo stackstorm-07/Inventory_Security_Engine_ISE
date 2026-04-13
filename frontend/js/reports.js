@@ -40,7 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 exportBtn.disabled = true;
                 exportBtn.textContent = 'Exporting...';
 
-                const response = await fetch('http://localhost:5000/api/dashboard/reports/export', {
+                const API_BASE = process.env.API_BASE_URL || 'http://localhost:5000';
+const response = await fetch(`${API_BASE}/api/dashboard/reports/export`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,

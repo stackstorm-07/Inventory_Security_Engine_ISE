@@ -1,0 +1,40 @@
+services:
+  # Backend Service
+  - type: web
+    name: ise-backend
+    env: node
+    plan: free
+    buildCommand: npm install && npm run start
+    startCommand: npm start
+    autoDeploy: true
+    healthCheckPath: /api-status
+
+  # Frontend Build & Deploy
+  - type: web
+    name: ise-frontend
+    env: static
+    plan: free
+    buildCommand: npm install
+    outputDir: frontend
+    rootDir: frontend
+    autoDeploy: true
+    routes:
+      - src: frontend/index.html
+        dest: /index.html
+      - src: frontend/dashboard.html
+        dest: /dashboard.html
+      - src: frontend/security-alerts.html
+        dest: /security-alerts.html
+      - src: frontend/admin-orders.html
+        dest: /admin-orders.html
+      - src: frontend/access-control.html
+        dest: /access-control.html
+      - src: frontend/reports.html
+        dest: /reports.html
+      - src: frontend/inventory-logs.html
+        dest: /inventory-logs.html
+
+environment:
+  API_BASE_URL: https://ise-backend.onrender.com
+
+version: "2024.04.13"

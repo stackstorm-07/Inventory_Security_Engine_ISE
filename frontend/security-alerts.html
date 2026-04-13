@@ -334,7 +334,7 @@
   //  SECURITY ALERTS PAGE — ISE
   //  Handles: display, SQL injection badge, filter, poll
   // ─────────────────────────────────────────────────────────
-  const API = 'http://localhost:5000';
+  const API = process.env.API_BASE_URL || 'http://localhost:5000';
   let allAlerts     = [];
   let currentFilter = 'all';
   let lastCount     = -1;          // for new-alert detection
@@ -574,7 +574,7 @@
       }, 8000);
     }
 
-    const API_BASE = 'http://localhost:5000';
+    const API_BASE = process.env.API_BASE_URL || 'http://localhost:5000';
     const evtSrc = new EventSource(
       API_BASE + '/api/admin/alert-stream?token=' + encodeURIComponent(token)
     );

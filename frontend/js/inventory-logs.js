@@ -41,7 +41,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function loadInventoryLogs() {
         try {
-            const response = await fetch('http://localhost:5000/api/dashboard/inventory-logs', {
+            const API_BASE = process.env.API_BASE_URL || 'http://localhost:5000';
+const response = await fetch(`${API_BASE}/api/dashboard/inventory-logs`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,

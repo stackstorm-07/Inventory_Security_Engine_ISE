@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const API = "http://localhost:5000/api/dashboard";
+    const API_BASE = process.env.API_BASE_URL || 'http://localhost:5000';
+const API = `${API_BASE}/api/dashboard`;
     const token = localStorage.getItem("token");
     let user = JSON.parse(localStorage.getItem("user") || "{}");
 
